@@ -1,0 +1,68 @@
+/* 최상단 버튼과 메뉴 div*/
+.menu1{
+    float:left;
+    box-sizing: border-box;
+    background-color: aqua;
+}
+.menu2{
+    float:right;
+    box-sizing: border-box;
+    background-color: blue;
+}
+.menu_title{
+    float:none;
+    box-sizing: border-box;
+    background-color: red;
+}
+/* p테그 텍스트 중앙정렬 */
+p{
+    text-align: center;
+}
+/*div테그 */
+div{
+    margin: 0;
+    padding : 0;
+}
+body{
+    height:100vh;
+    margin : 0;
+    padding : 0;
+}
+.mid{
+    height: 100%;
+}
+.font{
+    height: 10%;
+    position:relative;
+}
+/*도형배치 div*/
+.figure{
+    height: 100%;
+    width:20%;
+    background-color: #001234;
+    box-sizing: border-box;
+    float:right;
+}
+/* 사용자가 작업을하는 iframe이 들어간 div*/
+.page{
+    height: 100%;
+    width:60%;
+    box-sizing: border-box;
+    float: left;
+}
+/* 작업중인 프로젝트의 레이어를 보여주는 div */
+.layer{
+    float:left;
+    height: 100%;
+    width:20%;
+    background-color: #006712;
+    box-sizing: border-box;
+}
+
+/* iframe 관련 스타일 시트*/
+
+.work_sheet{
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
