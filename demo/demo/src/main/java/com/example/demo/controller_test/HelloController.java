@@ -9,6 +9,12 @@ public class HelloController {
     @GetMapping("/hello")
     public String hello(Model model){
         model.addAttribute("data","hello world");
-        return "hello";
+        return "sin4";
+    }
+
+    @GetMapping("/template")
+    public String template(Model model){
+        model.addAttribute("data","hello world");
+        return "working_page";
     }
 }
