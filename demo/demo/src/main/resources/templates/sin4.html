@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link href="bassStyle.css" rel="stylesheet"/>
     <meta charset="UTF-8">
     <title>4번페지</title>
     <link rel="stylesheet" href = "/static/css/sin4.css"/>
@@ -26,22 +27,243 @@
         <button type="button">우측정렬</button>
     </div>
 <!--최하단 및 도형 레이어 작업공간 부분-->
-    <div class = "mid">
-        <div class = "layer">작업중인 레이어를 보여줍니다#layer</div>
-        <div class = "figure">도형 삽입위치#figure<br/>
-            <button type="button">원</button><!--<button onclick = "함수명()"></button>-->
-            <button type="button">사각형</button>
-            <button type="button">삼각형</button>
-            <button type="button">포물선</button>
-            <button type="button">입력창</button> <!--ex) <input> 태그 -->
-
+    <div class = "mid" id = "makeWeb">
+        <dt>모양</dt>
+        <form id="makeWeb_form" onsubmit="return false;">
+        <dd class="object-shape">
+          <input type="radio" id="shape_circle" name="shape" value="circle" checked>
+          <label for="shape_circle">●</label>
+          <input type="radio" id="shape_rect" name="shape" value="rect">
+          <label for="shape_rect">■</label>
+          <input type="radio" id="shape_tri" name="shape" value="tri">
+          <label for="shape_tri">▲</label>
+        </dd>
+        <dt>사이즈</dt>
+              <dd class="object-size">
+                <label for="size_width">W</label>
+                <input type="text" id="size_width" class="align-right" name="width"value="100"><a>px</a><br>
+              </dd>
+              <dd class="object-size">
+                <label for="size_height">H</label>
+                <input type="text" id="size_height" class="align-right" name="height" value="100"><a>px</a>
+              </dd>
+    <dt>배경 색상</dt>
+    <dd class="object-color bg-color">
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              <input type="radio" id="bg_black" name="bg_color" value="bg-black" checked>
+              <label for="bg_black" class="bg-black black">&nbsp&nbsp&nbsp</label>
+            </td>
+            <td>
+              <input type="radio" id="bg_blue" name="bg_color" value="bg-blue">
+              <label for="bg_blue" class="bg-blue blue">&nbsp&nbsp&nbsp</label>
+            </td>
+            <td>
+              <input type="radio" id="bg_pink" name="bg_color" value="bg-pink">
+              <label for="bg_pink" class="bg-pink pink">&nbsp&nbsp&nbsp</label>
+            </td>
+            <td>
+              <input type="radio" id="bg_green" name="bg_color" value="bg-green">
+              <label for="bg_green" class="bg-green green">&nbsp&nbsp&nbsp</label>
+            </td>
+          </tr>
+        </tbody>              
+      </table>
+    </dd>
+    <div class="buttons align-right">
+        <button id="create_object">생성</button>
+      </div>
+    </form>
+    <div id="canvas">
+        <div class="wrapper">
         </div>
-        <div class = "page">
-            <iframe class = "work_sheet" src = "/template" width = "100%" height="100%" ></iframe>
-        </div>
+      </div>
     </div>
-
 <script>
+    //버튼 엮기
+    // '생성' 버튼에 클릭 이벤트 바인딩
+const btn_create = document.getElementById("create_object");
+btn_create.addEventListener("click", handleCreateObject);
+ 
+// 마우스 이벤트 추가
+document.addEventListener('mousemove', handleObjectDrag);
+document.addEventListener('mouseup', handleObjectDrop);
+
+                     //*  도형 생성  *//
+    
+                     //속성에서 최대값 구하기, 도형 우선 순위 계산
+    function getMaxAttr(objects, key, _default){
+    return (
+      objects.length > 0
+        ? Math.max.apply(null, Array.from(objects).map(object=>object.getAttribute(key))) 
+        : _default
+    )+1;
+  }
+   
+  // 도형 element 생성
+  function createObject(setting){
+    const canvas = document.querySelector("#canvas > .wrapper");
+    const objects = canvas.querySelectorAll(".object");
+    
+    let classList = ["object"];
+    let object = document.createElement("div");  
+    
+    // 도형 모양 설정
+    if( setting.shape ){
+      classList.push(setting.shape);
+    }
+   
+        // 배경 색상 설정
+        if( setting.bg_color ){
+      classList.push(setting.bg_color);
+    } 
+    // 우선순위 설정
+    const priority = getMaxAttr(objects, "priority", 0);
+    object.setAttribute("priority", priority);
+    object.style["z-index"] = priority;
+    
+
+    // 도형 사이즈 설정
+    if( setting.width && setting.height ){
+      object.style.width = setting.width+"px";
+      object.style.height = setting.height+"px";
+    }
+    
+    object.style["opacity"] = "100%" ;
+    
+    //도형값 저장
+    classList.push();
+    
+    // class 설정
+    object.className = classList.join(" ");
+    
+    // 이벤트 바인딩
+    object.addEventListener("mousedown", handleObjectHold); //꾹 누르고 움직임
+    object.addEventListener("dblclick", handleObjectRemove); // 더블 클릭시 삭제 
+    
+    return object;
+  }
+  
+// 도형 생성 이벤트 핸들러
+function handleCreateObject(event){
+    event.preventDefault();
+    
+    const canvas = document.querySelector("#canvas > .wrapper");
+    const makeWeb = document.getElementById("makeWeb_form");
+    const object_state = makeWeb.querySelectorAll('input[type="text"], input[type="radio"]:checked');
+    
+    // 도형 설정값을 JSON형태로 치환.
+    const settings = Array.from(object_state).reduce(function(prev, crnt, idx){
+      if( idx === 1 ) {
+        const _setting = {}
+        _setting[prev.name] = prev.value;
+        _setting[crnt.name] = crnt.value;
+        return _setting;
+      }
+      prev[crnt.name] =crnt.value;
+      
+      return prev;
+    });
+    console.log("Parsed settings:", settings);  // 로그 추가
+
+    // 도형 생성
+    const object = createObject(settings);
+
+    // 도형을 도화지에 추가
+    canvas.appendChild(object);
+    console.log("Object created and added to canvas.");  // 로그 추가
+}
+  // 도형 삭제 이벤트 핸들러
+  function handleObjectRemove(event){
+    event.preventDefault();
+    event.target.remove();
+  }
+
+                // 도형 선택 삭제 이벤트
+  // 도형 선택 이벤트 핸들러
+  function handleObjectHold(event){
+    event.preventDefault();
+    
+    event.target.focus();
+    
+    const canvas = document.querySelector("#canvas > .wrapper");
+    const objects = canvas.querySelectorAll(".object");
+    let seledted_object = event.target;
+    let classList = seledted_object.classList;
+    
+    if( !classList.contains("hold") ){
+      // 마우스 커서의 위치 (왼쪽 상단 모서리 기준)
+      const mouseX = event.clientX;
+      const mouseY = event.clientY;
+      
+      // 선택한 도형의 위치 (왼쪽 상단 모서리 기준)
+      const objectPos = seledted_object.getBoundingClientRect();
+      const objectX = objectPos.x;
+      const objectY = objectPos.y;
+      
+      // 도형과 마우스의 위치 차이
+      const gapX = mouseX - objectX;
+      const gapY = mouseY - objectY;
+      
+      // 도형과 마우스의 위치 차이를 속성에 저장
+      seledted_object.setAttribute("gap-x", gapX);
+      seledted_object.setAttribute("gap-y", gapY);
+      
+      // 선택한 도형을 맨 앞으로 보내기
+      const priority = getMaxAttr(objects, "priority", 0);
+      seledted_object.setAttribute("priority", priority);
+      seledted_object.style["z-index"] = priority;
+      
+      // 선택한 도형에 'hold' class를 추가
+      classList.add("hold");
+    }
+  }
+   
+  // 도형 움직임 이벤트 핸들러
+  function handleObjectDrag(event){
+    event.preventDefault();
+      
+    const canvas = document.querySelector("#canvas > .wrapper");
+    const object = canvas.querySelector(".object.hold");
+    if( object ){
+      // 마우스 커서의 위치. (왼쪽 상단 모서리 기준)
+      const mouseX = event.clientX;
+      const mouseY = event.clientY;
+      
+      // 도화지의 위치. (왼쪽 상단 모서리 기준)
+      const canvasPos = canvas.getBoundingClientRect();
+      const canvasX = canvasPos.x;
+      const canvasY = canvasPos.y;
+      
+      // 도형과 마우스의 위치 차이
+      const gapX = object.getAttribute("gap-x");
+      const gapY = object.getAttribute("gap-y");
+      
+      // 도형이 이동할 위치
+      const objectX = mouseX - gapX - canvasX;
+      const objectY = mouseY - gapY - canvasY;
+      
+      object.style.left = objectX+"px";
+      object.style.top = objectY+"px";
+    }
+  }
+   
+  // 도형 놓기 이벤트 핸들러
+  function handleObjectDrop(event){
+    event.preventDefault();
+      
+    const canvas = document.querySelector("#canvas > .wrapper");
+    const object = canvas.querySelector(".object.hold");
+    if( object ){
+      // 속성 및 class를 삭제
+      object.removeAttribute("gap-x")
+      object.removeAttribute("gap-y")
+      
+      object.classList.remove("hold");
+    }
+}
 
 
 </script>
