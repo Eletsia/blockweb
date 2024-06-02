@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link href="bassStyle.css" rel="stylesheet"/>
+  <link href="bassStyle.css" rel="stylesheet"/>
     <meta charset="UTF-8">
     <title>4번페지</title>
     <link rel="stylesheet" href = "/static/css/sin4.css"/>
@@ -126,13 +126,22 @@ document.addEventListener('mouseup', handleObjectDrop);
     
 
     // 도형 사이즈 설정
-    if( setting.width && setting.height ){
-      object.style.width = setting.width+"px";
-      object.style.height = setting.height+"px";
-    }
-    
-    object.style["opacity"] = "100%" ;
-    
+  
+    if (setting.width && setting.height){
+                if (setting.shape === "tri") {
+                    const halfWidth = setting.width / 2;
+                    object.style.borderLeft = `${halfWidth}px solid #FFFFFF`;
+                    object.style.borderRight = `${halfWidth}px solid #FFFFFF`;
+                    object.style.borderBottom = `${setting.height}px solid transparent`;
+                } else {
+                    object.style.width = setting.width + "px";
+                    object.style.height = setting.height + "px";
+                }
+            }
+            object.style.left = "0px";
+            object.style.top = "0px";
+
+  
     //도형값 저장
     classList.push();
     
@@ -166,14 +175,12 @@ function handleCreateObject(event){
       
       return prev;
     });
-    console.log("Parsed settings:", settings);  // 로그 추가
-
+  
     // 도형 생성
     const object = createObject(settings);
 
     // 도형을 도화지에 추가
     canvas.appendChild(object);
-    console.log("Object created and added to canvas.");  // 로그 추가
 }
   // 도형 삭제 이벤트 핸들러
   function handleObjectRemove(event){
