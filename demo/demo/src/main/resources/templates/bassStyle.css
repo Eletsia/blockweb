@@ -14,6 +14,9 @@ html, body { width: 100%; height: 100%; }
 
 /* 그림판 */
 #paint { width: 100%; height: 100%; }
+
+ /* 메뉴판 설정 */
+#makeWeb { width: 100%; height: 100%; padding: 10px; box-sizing: border-box; border: 1px solid darkgray; border-right: none; }
  
  /* 도화지 설정 */
 #canvas { width: 70%; height: 100%; box-sizing: border-box; border: 1px solid darkgray; }
@@ -28,6 +31,13 @@ html, body { width: 100%; height: 100%; }
 
 /* 도형 모양 */
 .circle { border-radius: 50%; }
+.tri {
+     width: 0;
+     height: 0;
+     border-left: 50px solid #FFFFFF;
+        border-right: 50px solid #FFFFFF;
+        border-bottom: 100px solid transparent;
+  }
 
 /* 도화지 설정 */
 #canvas { width: 100%; height: 50%; box-sizing: border-box; border: 1px solid darkgray; }
